@@ -26,6 +26,7 @@ import java.util.ArrayList;
 
 public class CommandManager {
     private ArrayList<Command> cmdList = new ArrayList<>();
+    private ArrayList<String> channels = new ArrayList<>();
     private String prefix;
 
     public void setPrefix(String prefix) {
@@ -38,6 +39,14 @@ public class CommandManager {
 
     public void register(ArrayList<Command> collection) {
         cmdList.addAll(collection);
+    }
+
+    public void setChannels(ArrayList<String> channels) {
+        this.channels = channels;
+    }
+
+    public ArrayList<String> getChannels() {
+        return channels;
     }
 
     public ArrayList<Command> getCommandList() {
@@ -58,9 +67,9 @@ public class CommandManager {
         for (Command cmd : cmdList) {
             if (cmd.getName().equals(cmdName)) {
                 if (cmd instanceof RoleCommand) {
-                    return ((RoleCommand) cmd).verifyAndRun(message.getAuthor(), args);
+                    return ((RoleCommand) cmd).verifyAndRun(message.getAuthor(), args, message.getChannel().getName());
                 } else {
-                    return cmd.run(args);
+                    return cmd.run(args, message.getChannel().getName());
                 }
             }
         }

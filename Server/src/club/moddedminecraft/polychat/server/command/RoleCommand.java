@@ -50,11 +50,11 @@ public abstract class RoleCommand extends Command {
         return false;
     }
 
-    public String verifyAndRun(IUser user, String[] args) {
+    public String verifyAndRun(IUser user, String[] args, String channel) {
         if (!verifyRole(user, role)) {
             return "User does not have permission to perform this command";
         }
-        return run(args);
+        return run(args, channel);
     }
 
 }

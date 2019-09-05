@@ -40,7 +40,7 @@ public abstract class Command {
         return this.name;
     }
 
-    public abstract String run(String[] args);
+    public abstract String run(String[] args, String channel);
 
 }
 

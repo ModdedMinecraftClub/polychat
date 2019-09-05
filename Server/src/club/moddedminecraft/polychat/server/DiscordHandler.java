@@ -78,11 +78,20 @@ public class DiscordHandler {
     public void onMessageEvent(MessageReceivedEvent event) {
         IGuild guild = event.getGuild();
         IChannel channel = event.getChannel();
+
         if (guild != null) {
             if (channel != null) {
-                if ((guild.getName().equals(Main.config.getProperty("guild_name"))) &&
-                        (channel.getName().equals(Main.config.getProperty("channel_name")))) {
-                    processMessage(event.getAuthor(), event.getMessage());
+                if (guild.getName().equals(Main.config.getProperty("guild_name"))) {
+
+                    if (event.getMessage().getContent().startsWith(discordPrefix)) {
+                        // don't bother processing message further if command
+                        if (processCommand(event.getMessage())) return;
+                    }
+
+                    if (channel.getName().equals(Main.config.getProperty("channel_name"))) {
+                        processMessage(event.getAuthor(), event.getMessage());
+                    }
+
                 }
             }
         }
@@ -101,6 +110,8 @@ public class DiscordHandler {
         Yaml yaml = new Yaml();
         LinkedHashMap yamlObj = yaml.load(new FileInputStream(Main.yamlConfig));
 
+        ArrayList<String> commandChannels = (ArrayList<String>) yamlObj.remove("channels");
+        manager.setChannels(commandChannels);
         for (Object entryObj : yamlObj.entrySet()) {
 
             Map.Entry<String, ArrayList> entry = (Map.Entry<String, ArrayList>) entryObj;
@@ -124,18 +135,22 @@ public class DiscordHandler {
         return manager;
     }
 
-    public void processMessage(IUser user, IMessage message) {
-        if (message.getContent().startsWith(discordPrefix)) {
+    public boolean processCommand(IMessage message) {
+        if (manager.getChannels().contains(message.getChannel().getName())) {
             String newMessage = manager.run(message);
             if (!newMessage.isEmpty()) {
                 System.out.println(newMessage);
-                Main.channel.sendMessage(newMessage);
+                message.getChannel().sendMessage(newMessage);
             }
-        } else {
-            ChatMessage discordMessage = new ChatMessage(user.getDisplayName(Main.channel.getGuild()) + ":", formatMessage(message), "empty");
-            System.out.println(discordMessage.getMessage());
-            Main.chatServer.sendMessage(discordMessage);
+            return true;
         }
+        return false;
+    }
+
+    public void processMessage(IUser user, IMessage message) {
+        ChatMessage discordMessage = new ChatMessage(user.getDisplayName(Main.channel.getGuild()) + ":", formatMessage(message), "empty");
+        System.out.println(discordMessage.getMessage());
+        Main.chatServer.sendMessage(discordMessage);
     }
 
     private String formatMessage(IMessage message) {

@@ -35,7 +35,7 @@ public class CommandHelp extends Command {
         return "Show this message";
     }
 
-    public String run(String[] args) {
+    public String run(String[] args, String channel) {
         StringBuilder help = new StringBuilder();
         for (Command command : Main.discordHandler.getManager().getCommandList()) {
             help.append(command.getName()).append(": ").append(command.getDescription()).append("\n");

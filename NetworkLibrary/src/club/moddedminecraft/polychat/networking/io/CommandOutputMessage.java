@@ -29,15 +29,18 @@ public class CommandOutputMessage extends Message {
     protected static final short MESSAGE_TYPE_ID = 7;
     private final String command;
     private final String commandOutput;
+    private final String channel;
 
-    public CommandOutputMessage(String command, String commandOutput) {
+    public CommandOutputMessage(String command, String commandOutput, String channel) {
         this.command = command;
         this.commandOutput = commandOutput;
+        this.channel = channel;
     }
 
     public CommandOutputMessage(DataInputStream istream) throws IOException {
         this.command = istream.readUTF();
         this.commandOutput = istream.readUTF();
+        this.channel = istream.readUTF();
     }
 
     public String getCommandOutput() {
@@ -48,11 +51,16 @@ public class CommandOutputMessage extends Message {
         return command;
     }
 
+    public String getChannel() {
+        return channel;
+    }
+
     @Override
     protected void send(DataOutputStream dataOutputStream) throws IOException {
         dataOutputStream.writeShort(MESSAGE_TYPE_ID);
         dataOutputStream.writeUTF(command);
         dataOutputStream.writeUTF(commandOutput);
+        dataOutputStream.writeUTF(channel);
     }
 
 }

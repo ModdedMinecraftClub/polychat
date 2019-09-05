@@ -28,22 +28,30 @@ public class CommandMessage extends Message {
 
     protected static final short MESSAGE_TYPE_ID = 6;
     private final String command;
+    private final String channel;
 
-    public CommandMessage(String command) {
+    public CommandMessage(String command, String channel) {
         this.command = command;
+        this.channel = channel;
     }
 
     public CommandMessage(DataInputStream istream) throws IOException {
         this.command = istream.readUTF();
+        this.channel = istream.readUTF();
     }
 
     public String getCommand() {
         return command;
     }
 
+    public String getChannel() {
+        return channel;
+    }
+
     @Override
     protected void send(DataOutputStream dataOutputStream) throws IOException {
         dataOutputStream.writeShort(MESSAGE_TYPE_ID);
         dataOutputStream.writeUTF(command);
+        dataOutputStream.writeUTF(channel);
     }
 }

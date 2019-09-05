@@ -33,6 +33,7 @@ public class MinecraftCommand extends RoleCommand {
 
     private final String command;
     private final int argCount;
+    private String channel;
 
     public MinecraftCommand(String name, Map<String, Object> args) {
         super(name, args);
@@ -46,7 +47,7 @@ public class MinecraftCommand extends RoleCommand {
         return matcher.groupCount();
     }
 
-    public String run(String[] inputArgs) {
+    public String run(String[] inputArgs, String channel) {
         String command = this.command;
 
         if (inputArgs.length < 1) {
@@ -84,7 +85,7 @@ public class MinecraftCommand extends RoleCommand {
         }
         command = command.replace("$args", String.join(" ", args));
 
-        server.getMessageBus().sendMessage(new CommandMessage(command));
+        server.getMessageBus().sendMessage(new CommandMessage(command, channel));
         return "";
     }
 

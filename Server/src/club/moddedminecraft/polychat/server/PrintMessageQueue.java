@@ -20,6 +20,7 @@ package club.moddedminecraft.polychat.server;
 import club.moddedminecraft.polychat.networking.io.*;
 import club.moddedminecraft.polychat.networking.util.ThreadedQueue;
 import sx.blah.discord.api.internal.json.objects.EmbedObject;
+import sx.blah.discord.handle.obj.IChannel;
 import sx.blah.discord.handle.obj.IGuild;
 import sx.blah.discord.handle.obj.IRole;
 import sx.blah.discord.handle.obj.IUser;
@@ -95,13 +96,20 @@ public class PrintMessageQueue extends ThreadedQueue<MessageData> {
                         CommandOutputMessage message = (CommandOutputMessage) rawMessage;
 
                         EmbedObject embed = new EmbedObject();
-                        embed.title = "/" + message.getCommand();
+                        if (!message.getCommand().isEmpty()) {
+                            embed.title = message.getCommand();
+                        }
                         embed.description = message.getCommandOutput();
                         Random rand = new Random();
                         // random colors :O
                         embed.color = rand.nextInt(0xFFFFFF);
 
-                        Main.channel.sendMessage(embed);
+                        IChannel channel = Main.channel.getGuild().getChannelsByName(message.getChannel()).get(0);
+                        if (channel != null) {
+                            channel.sendMessage(embed);
+                        } else {
+                            Main.channel.sendMessage("Failed to send message in channel " + message.getChannel() + "!");
+                        }
                     }
                 }
             } catch (RateLimitException e) {
