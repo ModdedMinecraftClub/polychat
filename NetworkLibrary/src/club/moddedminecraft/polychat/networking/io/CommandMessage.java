@@ -27,17 +27,24 @@ import java.io.IOException;
 public class CommandMessage extends Message {
 
     protected static final short MESSAGE_TYPE_ID = 6;
+    private final String serverID;
     private final String command;
     private final String channel;
 
-    public CommandMessage(String command, String channel) {
+    public CommandMessage(String serverID, String command, String channel) {
+        this.serverID = serverID;
         this.command = command;
         this.channel = channel;
     }
 
     public CommandMessage(DataInputStream istream) throws IOException {
+        this.serverID = istream.readUTF();
         this.command = istream.readUTF();
         this.channel = istream.readUTF();
+    }
+
+    public String getServerID() {
+        return serverID;
     }
 
     public String getCommand() {
@@ -51,6 +58,7 @@ public class CommandMessage extends Message {
     @Override
     protected void send(DataOutputStream dataOutputStream) throws IOException {
         dataOutputStream.writeShort(MESSAGE_TYPE_ID);
+        dataOutputStream.writeUTF(serverID);
         dataOutputStream.writeUTF(command);
         dataOutputStream.writeUTF(channel);
     }

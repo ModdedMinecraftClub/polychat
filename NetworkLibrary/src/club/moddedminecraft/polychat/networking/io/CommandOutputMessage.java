@@ -30,17 +30,24 @@ public class CommandOutputMessage extends Message {
     private final String command;
     private final String commandOutput;
     private final String channel;
+    private final String serverID;
 
-    public CommandOutputMessage(String command, String commandOutput, String channel) {
+    public CommandOutputMessage(String serverID, String command, String commandOutput, String channel) {
+        this.serverID = serverID;
         this.command = command;
         this.commandOutput = commandOutput;
         this.channel = channel;
     }
 
     public CommandOutputMessage(DataInputStream istream) throws IOException {
+        this.serverID = istream.readUTF();
         this.command = istream.readUTF();
         this.commandOutput = istream.readUTF();
         this.channel = istream.readUTF();
+    }
+
+    public String getServerID() {
+        return serverID;
     }
 
     public String getCommandOutput() {
@@ -58,6 +65,7 @@ public class CommandOutputMessage extends Message {
     @Override
     protected void send(DataOutputStream dataOutputStream) throws IOException {
         dataOutputStream.writeShort(MESSAGE_TYPE_ID);
+        dataOutputStream.writeUTF(serverID);
         dataOutputStream.writeUTF(command);
         dataOutputStream.writeUTF(commandOutput);
         dataOutputStream.writeUTF(channel);

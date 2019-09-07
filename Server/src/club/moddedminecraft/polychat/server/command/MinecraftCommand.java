@@ -48,6 +48,7 @@ public class MinecraftCommand extends RoleCommand {
     }
 
     public String run(String[] inputArgs, String channel) {
+        ArrayList<OnlineServer> executeServers = new ArrayList<>();
         String command = this.command;
 
         if (inputArgs.length < 1) {
@@ -64,9 +65,14 @@ public class MinecraftCommand extends RoleCommand {
             args.add(inputArgs[i]);
         }
 
-        OnlineServer server = Main.serverInfo.getServerNormalized(serverID);
-        if (server == null) {
-            return "Error running command: server prefix " + serverID + " does not exist.";
+        if (serverID.equals("<all>")) {
+            executeServers.addAll(Main.serverInfo.getServers());
+        } else {
+            OnlineServer server = Main.serverInfo.getServerNormalized(serverID);
+            if (server == null) {
+                return "Error running command: server prefix " + serverID + " does not exist.";
+            }
+            executeServers.add(server);
         }
 
         // get the last instance of every unique $(number)
@@ -85,7 +91,10 @@ public class MinecraftCommand extends RoleCommand {
         }
         command = command.replace("$args", String.join(" ", args));
 
-        server.getMessageBus().sendMessage(new CommandMessage(command, channel));
+        for (OnlineServer server : executeServers) {
+            server.getMessageBus().sendMessage(new CommandMessage(server.getServerID(), command, channel));
+        }
+
         return "";
     }
 

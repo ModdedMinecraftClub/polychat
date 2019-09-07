@@ -97,7 +97,7 @@ public class PrintMessageQueue extends ThreadedQueue<MessageData> {
 
                         EmbedObject embed = new EmbedObject();
                         if (!message.getCommand().isEmpty()) {
-                            embed.title = message.getCommand();
+                            embed.title = message.getServerID() + " : " + message.getCommand();
                         }
                         embed.description = message.getCommandOutput();
                         Random rand = new Random();
