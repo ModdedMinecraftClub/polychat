@@ -73,6 +73,6 @@ public class CommandManager {
                 }
             }
         }
-        return "Error running command: Command " + cmdName + " does not exist";
+        return "";
     }
 }
