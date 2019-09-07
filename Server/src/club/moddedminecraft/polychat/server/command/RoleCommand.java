@@ -24,34 +24,37 @@ import club.moddedminecraft.polychat.server.Main;
 import sx.blah.discord.handle.obj.IRole;
 import sx.blah.discord.handle.obj.IUser;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 public abstract class RoleCommand extends Command {
 
-    private final String role;
+    private final ArrayList<String> roles;
 
     public RoleCommand(String name, Map<String, Object> args) {
         super(name, args);
-        this.role = (String) args.get("role");
+        this.roles = (ArrayList<String>) args.get("roles");
     }
 
-    public boolean verifyRole(IUser user, String role) {
+    public boolean verifyRole(IUser user, ArrayList<String> roles) {
         List<IRole> userRoles = user.getRolesForGuild(Main.channel.getGuild());
-        if (role == null) {
+        if (roles == null) {
             return true;
         }
-        List<IRole> rolesByName = Main.channel.getGuild().getRolesByName(role);
-        for (IRole test_role : rolesByName) {
-            if (userRoles.contains(test_role)) {
-                return true;
+        for (String role : roles) {
+            List<IRole> rolesByName = Main.channel.getGuild().getRolesByName(role);
+            for (IRole test_role : rolesByName) {
+                if (userRoles.contains(test_role)) {
+                    return true;
+                }
             }
         }
         return false;
     }
 
     public String verifyAndRun(IUser user, String[] args, String channel) {
-        if (!verifyRole(user, role)) {
+        if (!verifyRole(user, roles)) {
             return "User does not have permission to perform this command";
         }
         return run(args, channel);
