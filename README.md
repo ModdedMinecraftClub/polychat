@@ -26,7 +26,7 @@ Chat messages are forwarded from discord to all connected MC servers, and from o
 
 `prefix_color`: This is the color of the broadcast prefix.  Refer to PolyChat Client README for color codes.
 
-#### Messages.txt
+### Messages.txt
 
 This file contains all of the broadcast messages that are sent out.  Contents are randomized after iterating through the list each time.
 
