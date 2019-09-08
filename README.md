@@ -2,7 +2,7 @@
 
 Both modules are built using IDEAs build system.  There are artifacts for creating jar files for both.
 
-Server is a standalone process that uses NetworkLibrary to interface with https://github.com/DemonScythe45/polychat-client running in an MC server.
+Server is a standalone process that uses NetworkLibrary to interface with <https://github.com/ModdedMinecraftClub/polychat-client> running in an MC server.
 
 Chat messages are forwarded from discord to all connected MC servers, and from once MC server to discord and other connected MC servers.
 
