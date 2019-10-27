@@ -23,14 +23,11 @@ package club.moddedminecraft.polychat.server;
 import club.moddedminecraft.polychat.networking.io.ChatMessage;
 import club.moddedminecraft.polychat.server.command.*;
 import com.vdurmont.emoji.EmojiParser;
+import discord4j.core.DiscordClient;
+import discord4j.core.event.EventDispatcher;
+import discord4j.core.event.domain.lifecycle.ReadyEvent;
+import discord4j.core.event.domain.message.MessageCreateEvent;
 import org.yaml.snakeyaml.Yaml;
-import sx.blah.discord.api.events.EventSubscriber;
-import sx.blah.discord.handle.impl.events.ReadyEvent;
-import sx.blah.discord.handle.impl.events.guild.channel.message.MessageReceivedEvent;
-import sx.blah.discord.handle.obj.IChannel;
-import sx.blah.discord.handle.obj.IGuild;
-import sx.blah.discord.handle.obj.IMessage;
-import sx.blah.discord.handle.obj.IUser;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -45,8 +42,13 @@ public class DiscordHandler {
     private String discordPrefix;
     private CommandManager manager = new CommandManager();
 
-    @EventSubscriber
-    public void onReadyEvent(ReadyEvent event) throws InvocationTargetException, FileNotFoundException, InstantiationException, IllegalAccessException, NoSuchMethodException {
+    public void registerEventSubscribers(DiscordClient client){
+        EventDispatcher eventDispatcher = client.getEventDispatcher();
+        eventDispatcher.on(ReadyEvent.class).subscribe(this::onReadyEvent);
+        eventDispatcher.on(MessageCreateEvent.class).subscribe(this::onMessageEvent);
+    }
+
+    public void onReadyEvent(ReadyEvent event) {
         System.out.println("Discord connection initialized!");
         List<IGuild> guilds = event.getClient().getGuilds();
         for (IGuild guild : guilds) {
@@ -74,8 +76,7 @@ public class DiscordHandler {
 
     }
 
-    @EventSubscriber
-    public void onMessageEvent(MessageReceivedEvent event) {
+    public void onMessageEvent(MessageCreateEvent event) {
         IGuild guild = event.getGuild();
         IChannel channel = event.getChannel();
 

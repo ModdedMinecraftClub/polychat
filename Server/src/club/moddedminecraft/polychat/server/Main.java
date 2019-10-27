@@ -22,9 +22,8 @@ package club.moddedminecraft.polychat.server;
 import club.moddedminecraft.polychat.networking.io.BroadcastMessage;
 import club.moddedminecraft.polychat.networking.io.Server;
 import club.moddedminecraft.polychat.server.info.OnlineServers;
-import sx.blah.discord.api.ClientBuilder;
-import sx.blah.discord.api.IDiscordClient;
-import sx.blah.discord.handle.obj.IChannel;
+import discord4j.core.DiscordClient;
+import discord4j.core.DiscordClientBuilder;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -35,7 +34,7 @@ public final class Main {
     public static File configFile;
     public static Server chatServer;
     public static PrintMessageQueue messageQueue;
-    public static IDiscordClient discordClient;
+    public static DiscordClient discordClient;
     public static IChannel channel = null;
     public static OnlineServers serverInfo = new OnlineServers();
     public static DiscordHandler discordHandler = new DiscordHandler();
@@ -153,10 +152,9 @@ public final class Main {
 
     //Initializes the connection to the discord API using the API token
     public static void initDiscord() {
-        ClientBuilder builder = new ClientBuilder();
-        builder.withToken(config.getProperty("api_token"));
-        discordClient = builder.login();
-        discordClient.getDispatcher().registerListener(discordHandler);
+        discordClient = new DiscordClientBuilder(config.getProperty("token")).build();
+        discordHandler.registerEventSubscribers(discordClient);
+        discordClient.login().block();
     }
 
     //Initializes the connection socket for game servers
