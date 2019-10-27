@@ -21,7 +21,6 @@
 package club.moddedminecraft.polychat.server;
 
 import club.moddedminecraft.polychat.networking.io.ChatMessage;
-import club.moddedminecraft.polychat.networking.io.AbstractMessage;
 import club.moddedminecraft.polychat.server.command.*;
 import com.vdurmont.emoji.EmojiParser;
 import discord4j.core.DiscordClient;

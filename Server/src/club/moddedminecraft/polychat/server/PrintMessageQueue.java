@@ -92,7 +92,7 @@ public class PrintMessageQueue extends ThreadedQueue<MessageData> {
                     embedSpec.setDescription(message.getCommandOutput());
                     Random random = new Random(System.currentTimeMillis());
                     embedSpec.setColor(new Color(random.nextInt(0xFFFFFF)));
-                });
+                }).block();
             }
         }
     }

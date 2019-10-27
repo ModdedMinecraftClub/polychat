@@ -29,7 +29,7 @@ public abstract class ThreadedQueue<T> {
             try{
                 init();
             }catch(Throwable t){
-                throw new RuntimeException(t);
+                t.printStackTrace();
             }
         });
     }
@@ -43,7 +43,7 @@ public abstract class ThreadedQueue<T> {
             try{
                 handle(obj);
             }catch(Throwable t){
-                throw new RuntimeException(t);
+                t.printStackTrace();
             }
         });
     }

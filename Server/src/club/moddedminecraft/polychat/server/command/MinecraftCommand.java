@@ -56,7 +56,7 @@ public class MinecraftCommand extends RoleCommand {
         }
 
         if (inputArgs.length < (this.argCount - 1)) {
-            return "Expected at least " + this.argCount + " parameters, recieved " + (inputArgs.length - 1);
+            return "Expected at least " + this.argCount + " parameters, received " + (inputArgs.length - 1);
         }
 
         String serverID = inputArgs[0];
