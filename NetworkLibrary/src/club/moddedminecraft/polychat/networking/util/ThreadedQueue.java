@@ -17,72 +17,35 @@
  */
 package club.moddedminecraft.polychat.networking.util;
 
-import java.util.LinkedList;
-import java.util.concurrent.locks.ReentrantLock;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public abstract class ThreadedQueue<T> {
-    private Thread thread;
-    private boolean run = true;
-    private LinkedList<T> queue = new LinkedList<>();
-    private boolean isCodeRunning = false;
-    private final ReentrantLock isCodeRunningLock = new ReentrantLock();
+    private ExecutorService executorService;
 
-    public final synchronized void start() {
-        thread = new Thread(this::queueThread);
-        thread.start();
-    }
-
-    public final synchronized void stop() {
-        this.run = false;
-        interruptQueueThread();
-    }
-
-    public final synchronized void enqueue(T obj) {
-        queue.push(obj);
-        interruptQueueThread();
-    }
-
-    private final synchronized void interruptQueueThread(){
-        if(thread != null && !isCodeRunning){
-            thread.interrupt();
-        }
-    }
-
-    private final void queueThread() {
-        try {
-            init();
-            while (true) {
-                try {
-                    Thread.sleep(5000);
-                } catch (InterruptedException e) {
-                }
-                if (!(this.run)) break;
-                T nextItem;
-                while ((nextItem = getNextItem()) != null) {
-                    synchronized(this){
-                        isCodeRunning = true;
-                    }
-                    try{
-                        handle(nextItem);
-                    }finally{
-                        synchronized(this){
-                            isCodeRunning = false;
-                        }
-                    }
-                }
+    public final void start() {
+        executorService = Executors.newSingleThreadExecutor();
+        executorService.submit(() -> {
+            try{
+                init();
+            }catch(Throwable t){
+                throw new RuntimeException(t);
             }
-        } catch (Throwable t) {
-            t.printStackTrace();
-        }
-        System.out.println("Queue thread exiting!");
+        });
     }
 
-    private final synchronized T getNextItem() {
-        if (queue.isEmpty()) {
-            return null;
-        } else {
-            return queue.pop();
-        }
+    public final void stop() {
+        executorService.shutdown();
+    }
+
+    public final synchronized void enqueue(final T obj) {
+        executorService.submit(() -> {
+            try{
+                handle(obj);
+            }catch(Throwable t){
+                throw new RuntimeException(t);
+            }
+        });
     }
 
     protected abstract void init() throws Throwable;
