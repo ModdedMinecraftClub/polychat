@@ -25,7 +25,7 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 
 //Used for broadcasting server online/offline events
-public class ServerStatusMessage extends Message {
+public class ServerStatusMessage extends AbstractMessage{
     protected static final short MESSAGE_TYPE_ID = 2;
     private final String serverID, prefixJson;
     private final short state;

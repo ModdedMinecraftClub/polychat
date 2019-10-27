@@ -51,7 +51,7 @@ public final class Server {
         }
     }
 
-    public void sendMessage(Message message) {
+    public void sendMessage(AbstractMessage message) {
         ArrayList<MessageBus> toRemove = new ArrayList<>();
         for (MessageBus messageBus : messageBuses) {
             if (messageBus.isSocketClosed()) {
@@ -118,7 +118,7 @@ public final class Server {
         }
 
         @Override
-        public void receive(Message message) {
+        public void receive(AbstractMessage message) {
             MessageData messageData = new MessageData(message, messageBus);
             for (ThreadedQueue<MessageData> messageProcessor : messageProcessors) {
                 messageProcessor.enqueue(messageData);

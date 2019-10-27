@@ -21,15 +21,14 @@
 package club.moddedminecraft.polychat.server;
 
 import club.moddedminecraft.polychat.networking.io.ChatMessage;
+import club.moddedminecraft.polychat.networking.io.AbstractMessage;
 import club.moddedminecraft.polychat.server.command.*;
 import com.vdurmont.emoji.EmojiParser;
 import discord4j.core.DiscordClient;
 import discord4j.core.event.EventDispatcher;
 import discord4j.core.event.domain.guild.GuildCreateEvent;
-import discord4j.core.event.domain.lifecycle.ReadyEvent;
 import discord4j.core.event.domain.message.MessageCreateEvent;
-import discord4j.core.object.entity.Guild;
-import discord4j.core.object.entity.GuildChannel;
+import discord4j.core.object.entity.*;
 import org.yaml.snakeyaml.Yaml;
 import reactor.core.publisher.Flux;
 
@@ -76,24 +75,20 @@ public class DiscordHandler {
     }
 
     public void onMessageEvent(MessageCreateEvent event) {
-        IGuild guild = event.getGuild();
-        IChannel channel = event.getChannel();
+        Guild guild = event.getGuild().block();
+        Channel channel = event.getMessage().getChannel().block();
 
-        if (guild != null) {
-            if (channel != null) {
-                if (guild.getName().equals(Main.config.getProperty("guild_name"))) {
-
-                    if (event.getMessage().getContent().startsWith(discordPrefix)) {
-                        // don't bother processing message further if command
-                        if (processCommand(event.getMessage())) return;
-                    }
-
-                    if (channel.getName().equals(Main.config.getProperty("channel_name"))) {
-                        processMessage(event.getAuthor(), event.getMessage());
-                    }
-
-                }
+        if (guild.getName().equals(Main.config.getProperty("guild_name")) && event.getMessage().getContent().isPresent()) {
+            String content = event.getMessage().getContent().get();
+            if (content.startsWith(discordPrefix)) {
+                // don't bother processing message further if command
+                if (processCommand(event.getMessage())) return;
             }
+
+            if (channel.equals(Main.config.getProperty("channel_name"))) {
+                processMessage(event.getMessage());
+            }
+
         }
     }
 
@@ -135,26 +130,27 @@ public class DiscordHandler {
         return manager;
     }
 
-    public boolean processCommand(IMessage message) {
-        if (manager.getChannels().contains(message.getChannel().getName())) {
+    public boolean processCommand(Message message) {
+        TextChannel textChannel = message.getChannel().ofType(TextChannel.class).block();
+        if (textChannel != null && manager.getChannels().contains(textChannel.getName())) {
             String newMessage = manager.run(message);
             if (!newMessage.isEmpty()) {
                 System.out.println(newMessage);
-                message.getChannel().sendMessage(newMessage);
+                message.getChannel().block().createMessage(newMessage).block();
             }
             return true;
         }
         return false;
     }
 
-    public void processMessage(IUser user, IMessage message) {
-        ChatMessage discordMessage = new ChatMessage(user.getDisplayName(Main.channel.getGuild()) + ":", formatMessage(message), "empty");
+    public void processMessage(Message message) {
+        ChatMessage discordMessage = new ChatMessage(message.getAuthorAsMember().block().getDisplayName() + ":", formatMessage(message), "empty");
         System.out.println(discordMessage.getMessage());
         Main.chatServer.sendMessage(discordMessage);
     }
 
-    private String formatMessage(IMessage message) {
-        String messageContent = message.getFormattedContent();
+    private String formatMessage(Message message) {
+        String messageContent = message.getContent().get();
         messageContent = EmojiParser.parseToAliases(messageContent);
 
         Pattern emojiName = Pattern.compile("<(:\\w+:)\\d+>");

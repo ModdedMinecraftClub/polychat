@@ -24,7 +24,7 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
-public class CommandOutputMessage extends Message {
+public class CommandOutputMessage extends AbstractMessage{
 
     protected static final short MESSAGE_TYPE_ID = 7;
     private final String command;

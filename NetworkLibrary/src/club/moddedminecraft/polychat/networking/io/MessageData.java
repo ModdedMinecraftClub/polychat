@@ -18,15 +18,15 @@
 package club.moddedminecraft.polychat.networking.io;
 
 public final class MessageData {
-    private final Message message;
+    private final AbstractMessage message;
     private final MessageBus messageBus;
 
-    public MessageData(Message message, MessageBus messageBus) {
+    public MessageData(AbstractMessage message, MessageBus messageBus) {
         this.message = message;
         this.messageBus = messageBus;
     }
 
-    public Message getMessage() {
+    public AbstractMessage getMessage() {
         return message;
     }
 

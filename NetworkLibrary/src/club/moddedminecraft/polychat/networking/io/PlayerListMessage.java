@@ -5,7 +5,7 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 
-public class PlayerListMessage extends Message {
+public class PlayerListMessage extends AbstractMessage{
 
     protected static final short MESSAGE_TYPE_ID = 5;
     private final String serverID;

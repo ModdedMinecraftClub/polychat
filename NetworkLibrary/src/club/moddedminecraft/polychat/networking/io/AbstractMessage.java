@@ -19,7 +19,7 @@ package club.moddedminecraft.polychat.networking.io;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
-public abstract class Message {
+public abstract class AbstractMessage{
 
     protected abstract void send(DataOutputStream dataOutputStream) throws IOException;
 

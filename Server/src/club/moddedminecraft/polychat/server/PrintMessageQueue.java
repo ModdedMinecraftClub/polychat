@@ -41,7 +41,7 @@ public class PrintMessageQueue extends ThreadedQueue<MessageData> {
 
     @Override
     protected void handle(MessageData messageData) {
-        Message rawMessage = messageData.getMessage();
+        AbstractMessage rawMessage = messageData.getMessage();
         boolean limited = false;
         do {
             try {

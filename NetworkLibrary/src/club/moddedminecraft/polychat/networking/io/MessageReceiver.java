@@ -94,14 +94,14 @@ public final class MessageReceiver {
         System.out.println("Message receiver thread exiting!");
     }
 
-    private class MessageProcessingQueue extends ThreadedQueue<Message> {
+    private class MessageProcessingQueue extends ThreadedQueue<AbstractMessage> {
 
         @Override
         protected void init() {
         }
 
         @Override
-        protected void handle(Message obj) {
+        protected void handle(AbstractMessage obj) {
             receiverCallback.receive(obj);
         }
     }

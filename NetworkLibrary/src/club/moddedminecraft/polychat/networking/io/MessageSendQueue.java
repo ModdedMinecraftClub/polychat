@@ -23,7 +23,7 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
 
-public final class MessageSendQueue extends ThreadedQueue<Message> {
+public final class MessageSendQueue extends ThreadedQueue<AbstractMessage> {
     private final Socket socket;
     private DataOutputStream dataOutputStream;
 
@@ -37,7 +37,7 @@ public final class MessageSendQueue extends ThreadedQueue<Message> {
     }
 
     @Override
-    protected void handle(Message obj) throws IOException {
+    protected void handle(AbstractMessage obj) throws IOException {
         obj.send(dataOutputStream);
     }
 

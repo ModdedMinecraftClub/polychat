@@ -21,7 +21,7 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
-public final class BroadcastMessage extends Message {
+public final class BroadcastMessage extends AbstractMessage{
     protected static final short MESSAGE_TYPE_ID = 0;
     private final String prefix, message;
     private final int prefix_color;

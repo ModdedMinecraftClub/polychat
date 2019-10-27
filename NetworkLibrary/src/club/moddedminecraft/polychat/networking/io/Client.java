@@ -23,7 +23,7 @@ import java.util.ArrayList;
 
 public final class Client {
     private final MessageBus messageBus;
-    private ArrayList<Message> receivedMessages;
+    private ArrayList<AbstractMessage> receivedMessages;
 
     public Client(String serverIp, int port) throws IOException {
         messageBus = new MessageBus(new Socket(serverIp, port), this::receiveMessage);
@@ -33,20 +33,20 @@ public final class Client {
         messageBus.start();
     }
 
-    public synchronized ArrayList<Message> getReceivedMessages() {
-        ArrayList<Message> messages = receivedMessages;
+    public synchronized ArrayList<AbstractMessage> getReceivedMessages() {
+        ArrayList<AbstractMessage> messages = receivedMessages;
         receivedMessages = null;
         return messages;
     }
 
-    private synchronized void receiveMessage(Message message) {
+    private synchronized void receiveMessage(AbstractMessage message) {
         if (receivedMessages == null) {
             receivedMessages = new ArrayList<>();
         }
         receivedMessages.add(message);
     }
 
-    public void sendMessage(Message message) {
+    public void sendMessage(AbstractMessage message) {
         messageBus.sendMessage(message);
     }
 

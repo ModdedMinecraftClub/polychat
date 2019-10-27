@@ -26,7 +26,7 @@ import java.io.IOException;
 
 //Sends data to main polychat server when the game launches
 //Data is used when displaying info about all servers in discord
-public class ServerInfoMessage extends Message {
+public class ServerInfoMessage extends AbstractMessage{
     protected static final short MESSAGE_TYPE_ID = 4;
     private final String serverID, serverName, serverAddress;
     private final int maxPlayers;

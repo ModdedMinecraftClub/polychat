@@ -51,7 +51,7 @@ public final class MessageBus {
         return this.socket.isClosed();
     }
 
-    public void sendMessage(Message message) {
+    public void sendMessage(AbstractMessage message) {
         messageSendQueue.enqueue(message);
     }
 
