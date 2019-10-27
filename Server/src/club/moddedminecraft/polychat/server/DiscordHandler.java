@@ -84,8 +84,8 @@ public class DiscordHandler {
                 // don't bother processing message further if command
                 if (processCommand(event.getMessage())) return;
             }
-
-            if (channel.equals(Main.config.getProperty("channel_name"))) {
+            TextChannel textChannel = event.getMessage().getChannel().ofType(TextChannel.class).block();
+            if (textChannel.getName().equals(Main.config.getProperty("channel_name"))) {
                 processMessage(event.getMessage());
             }
 

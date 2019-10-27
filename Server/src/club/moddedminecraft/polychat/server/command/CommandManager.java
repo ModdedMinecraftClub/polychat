@@ -20,7 +20,8 @@
 
 package club.moddedminecraft.polychat.server.command;
 
-import sx.blah.discord.handle.obj.IMessage;
+import discord4j.core.object.entity.Message;
+import discord4j.core.object.entity.TextChannel;
 
 import java.util.ArrayList;
 
@@ -53,9 +54,11 @@ public class CommandManager {
         return cmdList;
     }
 
-    public String run(IMessage message) {
+    public String run(Message message) {
+        TextChannel textChannel = message.getChannel().ofType(TextChannel.class).block();
+
         // get message content and remove prefix
-        String content = message.getContent().replace(this.prefix, "");
+        String content = message.getContent().get().substring(prefix.length());
         // get first word (command name)
         String[] rawCommand = content.split(" ", 2);
         String cmdName = rawCommand[0];
@@ -67,9 +70,9 @@ public class CommandManager {
         for (Command cmd : cmdList) {
             if (cmd.getName().equals(cmdName)) {
                 if (cmd instanceof RoleCommand) {
-                    return ((RoleCommand) cmd).verifyAndRun(message.getAuthor(), args, message.getChannel().getName());
+                    return ((RoleCommand) cmd).verifyAndRun(message.getAuthorAsMember().block(), args, textChannel.getName());
                 } else {
-                    return cmd.run(args, message.getChannel().getName());
+                    return cmd.run(args, textChannel.getName());
                 }
             }
         }

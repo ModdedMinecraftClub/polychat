@@ -20,12 +20,11 @@
 
 package club.moddedminecraft.polychat.server.command;
 
-import club.moddedminecraft.polychat.server.Main;
-import sx.blah.discord.handle.obj.IRole;
-import sx.blah.discord.handle.obj.IUser;
+import discord4j.core.object.entity.Member;
+import discord4j.core.object.entity.Role;
+import reactor.core.publisher.Flux;
 
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 
 public abstract class RoleCommand extends Command {
@@ -37,23 +36,20 @@ public abstract class RoleCommand extends Command {
         this.roles = (ArrayList<String>) args.get("roles");
     }
 
-    public boolean verifyRole(IUser user, ArrayList<String> roles) {
-        List<IRole> userRoles = user.getRolesForGuild(Main.channel.getGuild());
+    public boolean verifyRole(Member user, ArrayList<String> roles) {
+        Flux<Role> userRoles = user.getRoles();
         if (roles == null) {
             return true;
         }
-        for (String role : roles) {
-            List<IRole> rolesByName = Main.channel.getGuild().getRolesByName(role);
-            for (IRole test_role : rolesByName) {
-                if (userRoles.contains(test_role)) {
-                    return true;
-                }
+        for(Role role : userRoles.toIterable()){
+            if(roles.contains(role.getName())){
+                return true;
             }
         }
         return false;
     }
 
-    public String verifyAndRun(IUser user, String[] args, String channel) {
+    public String verifyAndRun(Member user, String[] args, String channel) {
         if (!verifyRole(user, roles)) {
             return "User does not have permission to perform this command";
         }
