@@ -24,6 +24,7 @@ import club.moddedminecraft.polychat.networking.io.Server;
 import club.moddedminecraft.polychat.server.info.OnlineServers;
 import discord4j.core.DiscordClient;
 import discord4j.core.DiscordClientBuilder;
+import discord4j.core.object.entity.GuildChannel;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -35,7 +36,7 @@ public final class Main {
     public static Server chatServer;
     public static PrintMessageQueue messageQueue;
     public static DiscordClient discordClient;
-    public static IChannel channel = null;
+    public static GuildChannel channel = null;
     public static OnlineServers serverInfo = new OnlineServers();
     public static DiscordHandler discordHandler = new DiscordHandler();
     public static BroadcastManager broadcastManager = null;

@@ -25,9 +25,13 @@ import club.moddedminecraft.polychat.server.command.*;
 import com.vdurmont.emoji.EmojiParser;
 import discord4j.core.DiscordClient;
 import discord4j.core.event.EventDispatcher;
+import discord4j.core.event.domain.guild.GuildCreateEvent;
 import discord4j.core.event.domain.lifecycle.ReadyEvent;
 import discord4j.core.event.domain.message.MessageCreateEvent;
+import discord4j.core.object.entity.Guild;
+import discord4j.core.object.entity.GuildChannel;
 import org.yaml.snakeyaml.Yaml;
+import reactor.core.publisher.Flux;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -44,36 +48,31 @@ public class DiscordHandler {
 
     public void registerEventSubscribers(DiscordClient client){
         EventDispatcher eventDispatcher = client.getEventDispatcher();
-        eventDispatcher.on(ReadyEvent.class).subscribe(this::onReadyEvent);
+        eventDispatcher.on(GuildCreateEvent.class).subscribe(this::onGuildCreate);
         eventDispatcher.on(MessageCreateEvent.class).subscribe(this::onMessageEvent);
     }
 
-    public void onReadyEvent(ReadyEvent event) {
-        System.out.println("Discord connection initialized!");
-        List<IGuild> guilds = event.getClient().getGuilds();
-        for (IGuild guild : guilds) {
-            if (guild.getName().equals(Main.config.getProperty("guild_name"))) {
-                List<IChannel> channels = guild.getChannels();
-                for (IChannel channel : channels) {
-                    if (channel.getName().equals(Main.config.getProperty("channel_name"))) {
-                        Main.channel = channel;
-                        System.out.println("Established main message channel!");
-                        Main.startServer();
-                        discordPrefix = Main.config.getProperty("discord_prefix", "!");
-                        manager.setPrefix(discordPrefix);
-                        try {
-                            registerCommands();
-                        } catch (Exception e) {
-                            System.err.println("Error " + e.toString() + " encountered while registering commands, ignoring...");
-                        }
-                        return;
+    public void onGuildCreate(GuildCreateEvent event){
+        Guild guild = event.getGuild();
+        if(guild.getName().equals(Main.config.getProperty("channel_name"))){
+            Flux<GuildChannel> guildChannelFlux = guild.getChannels();
+            for(GuildChannel channel : guildChannelFlux.toIterable()){
+                if(channel.getName().equals(Main.config.getProperty("channel_name"))){
+                    System.out.println("Established main message channel!");
+                    Main.channel = channel;
+                    Main.startServer();
+                    discordPrefix = Main.config.getProperty("discord_prefix", "!");
+                    manager.setPrefix(discordPrefix);
+                    try{
+                        registerCommands();
+                    }catch(Exception e){
+                        System.err.println("Error " + e.toString() + " encountered while registering commands, ignoring...");
                     }
                 }
             }
         }
         Main.startServer();
         System.out.println("Failed to establish message channel! Will not send messages...");
-
     }
 
     public void onMessageEvent(MessageCreateEvent event) {
