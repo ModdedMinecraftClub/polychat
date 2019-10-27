@@ -53,7 +53,7 @@ public class DiscordHandler {
 
     public void onGuildCreate(GuildCreateEvent event){
         Guild guild = event.getGuild();
-        if(guild.getName().equals(Main.config.getProperty("channel_name"))){
+        if(guild.getName().equals(Main.config.getProperty("guild_name"))){
             Flux<GuildChannel> guildChannelFlux = guild.getChannels();
             for(GuildChannel channel : guildChannelFlux.toIterable()){
                 if(channel.getName().equals(Main.config.getProperty("channel_name"))){
@@ -67,6 +67,7 @@ public class DiscordHandler {
                     }catch(Exception e){
                         System.err.println("Error " + e.toString() + " encountered while registering commands, ignoring...");
                     }
+                    return;
                 }
             }
         }
@@ -76,7 +77,6 @@ public class DiscordHandler {
 
     public void onMessageEvent(MessageCreateEvent event) {
         Guild guild = event.getGuild().block();
-        Channel channel = event.getMessage().getChannel().block();
 
         if (guild.getName().equals(Main.config.getProperty("guild_name")) && event.getMessage().getContent().isPresent()) {
             String content = event.getMessage().getContent().get();
@@ -85,7 +85,7 @@ public class DiscordHandler {
                 if (processCommand(event.getMessage())) return;
             }
             TextChannel textChannel = event.getMessage().getChannel().ofType(TextChannel.class).block();
-            if (textChannel.getName().equals(Main.config.getProperty("channel_name"))) {
+            if (textChannel.getName().equals(Main.config.getProperty("channel_name")) && !event.getMessage().getAuthorAsMember().block().isBot()) {
                 processMessage(event.getMessage());
             }
 

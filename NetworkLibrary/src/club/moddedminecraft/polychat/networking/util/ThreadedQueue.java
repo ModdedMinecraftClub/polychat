@@ -18,11 +18,14 @@
 package club.moddedminecraft.polychat.networking.util;
 
 import java.util.LinkedList;
+import java.util.concurrent.locks.ReentrantLock;
 
 public abstract class ThreadedQueue<T> {
     private Thread thread;
     private boolean run = true;
     private LinkedList<T> queue = new LinkedList<>();
+    private boolean isCodeRunning = false;
+    private final ReentrantLock isCodeRunningLock = new ReentrantLock();
 
     public final synchronized void start() {
         thread = new Thread(this::queueThread);
@@ -31,12 +34,18 @@ public abstract class ThreadedQueue<T> {
 
     public final synchronized void stop() {
         this.run = false;
-        thread.interrupt();
+        interruptQueueThread();
     }
 
     public final synchronized void enqueue(T obj) {
         queue.push(obj);
-        if (thread != null) thread.interrupt();
+        interruptQueueThread();
+    }
+
+    private final synchronized void interruptQueueThread(){
+        if(thread != null && !isCodeRunning){
+            thread.interrupt();
+        }
     }
 
     private final void queueThread() {
@@ -50,7 +59,16 @@ public abstract class ThreadedQueue<T> {
                 if (!(this.run)) break;
                 T nextItem;
                 while ((nextItem = getNextItem()) != null) {
-                    handle(nextItem);
+                    synchronized(this){
+                        isCodeRunning = true;
+                    }
+                    try{
+                        handle(nextItem);
+                    }finally{
+                        synchronized(this){
+                            isCodeRunning = false;
+                        }
+                    }
                 }
             }
         } catch (Throwable t) {

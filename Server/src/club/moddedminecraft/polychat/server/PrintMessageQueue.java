@@ -28,7 +28,6 @@ import java.util.regex.Pattern;
 
 public class PrintMessageQueue extends ThreadedQueue<MessageData> {
 
-
     @Override
     protected void init() {
         System.out.println("ready to print messages");
