@@ -19,14 +19,9 @@ package club.moddedminecraft.polychat.server;
 
 import club.moddedminecraft.polychat.networking.io.*;
 import club.moddedminecraft.polychat.networking.util.ThreadedQueue;
-import sx.blah.discord.api.internal.json.objects.EmbedObject;
-import sx.blah.discord.handle.obj.IChannel;
-import sx.blah.discord.handle.obj.IGuild;
-import sx.blah.discord.handle.obj.IRole;
-import sx.blah.discord.handle.obj.IUser;
-import sx.blah.discord.util.RateLimitException;
+import discord4j.core.object.entity.*;
 
-import java.util.List;
+import java.awt.*;
 import java.util.Random;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -42,93 +37,69 @@ public class PrintMessageQueue extends ThreadedQueue<MessageData> {
     @Override
     protected void handle(MessageData messageData) {
         AbstractMessage rawMessage = messageData.getMessage();
-        boolean limited = false;
-        do {
-            try {
-                limited = false;
-                if (Main.channel != null) {
-                    if (rawMessage instanceof ChatMessage) {
-                        ChatMessage message = ((ChatMessage) rawMessage);
-                        System.out.println(message.getUsername() + " " + message.getMessage());
-                        Main.channel.sendMessage("**`" + message.getUsername() + "`** " + formatMessage(message.getMessage()));
-                    } else if (rawMessage instanceof ServerInfoMessage) {
-                        ServerInfoMessage infoMessage = ((ServerInfoMessage) rawMessage);
-                        Main.serverInfo.serverConnected(infoMessage.getServerID(),
-                                infoMessage.getServerName(),
-                                infoMessage.getServerAddress(),
-                                infoMessage.getMaxPlayers(),
-                                messageData.getMessageBus());
-                    } else if (rawMessage instanceof ServerStatusMessage) {
-                        ServerStatusMessage serverStatus = ((ServerStatusMessage) rawMessage);
-                        switch (serverStatus.getState()) {
-                            case 1:
-                                Main.channel.sendMessage("**`" + serverStatus.getServerID() + " Server Online`**");
-                                Main.serverInfo.serverOnline(serverStatus.getServerID());
-                                break;
-                            case 2:
-                                Main.channel.sendMessage("**`" + serverStatus.getServerID() + " Server Offline`**");
-                                Main.serverInfo.serverOffline(serverStatus.getServerID());
-                                break;
-                            case 3:
-                                Main.channel.sendMessage("**`" + serverStatus.getServerID() + " Server Crashed`**");
-                                Main.serverInfo.serverOffline(serverStatus.getServerID());
-                                break;
-                            default:
-                                System.err.println("Unrecognized server state " + serverStatus.getState() + " received from " + serverStatus.getServerID());
-                        }
-                    } else if (rawMessage instanceof PlayerStatusMessage) {
-                        String statusString;
-                        PlayerStatusMessage playerStatus = ((PlayerStatusMessage) rawMessage);
-                        if (playerStatus.getJoined()) {
-                            statusString = "**`" + playerStatus.getServerID() + " " + playerStatus.getUserName() + " has joined the game`**";
-                            Main.serverInfo.playerJoin(playerStatus.getServerID(), playerStatus.getUserName());
-                        } else {
-                            statusString = "**`" + playerStatus.getServerID() + " " + playerStatus.getUserName() + " has left the game`**";
-                            Main.serverInfo.playerLeave(playerStatus.getServerID(), playerStatus.getUserName());
-                        }
-                        if (!playerStatus.getSilent()) {
-                            Main.channel.sendMessage(statusString);
-                        }
-                    } else if (rawMessage instanceof PlayerListMessage) {
-                        PlayerListMessage plMessage = (PlayerListMessage) rawMessage;
-                        Main.serverInfo.updatePlayerList(plMessage.getServerID(), plMessage.getPlayerList());
-                    } else if (rawMessage instanceof CommandOutputMessage) {
-                        CommandOutputMessage message = (CommandOutputMessage) rawMessage;
-
-                        EmbedObject embed = new EmbedObject();
-                        if (!message.getCommand().isEmpty()) {
-                            embed.title = message.getServerID() + " : " + message.getCommand();
-                        }
-                        embed.description = message.getCommandOutput();
-                        Random rand = new Random();
-                        // random colors :O
-                        embed.color = rand.nextInt(0xFFFFFF);
-
-                        IChannel channel = Main.channel.getGuild().getChannelsByName(message.getChannel()).get(0);
-                        if (channel != null) {
-                            channel.sendMessage(embed);
-                        } else {
-                            Main.channel.sendMessage("Failed to send message in channel " + message.getChannel() + "!");
-                        }
+        MessageChannel messageChannel = (MessageChannel)Main.channel;
+        if(Main.channel != null){
+            if(rawMessage instanceof ChatMessage){
+                ChatMessage message = ((ChatMessage) rawMessage);
+                System.out.println(message.getUsername() + " " + message.getMessage());
+                messageChannel.createMessage("**`" + message.getUsername() + "`** " + formatMessage(message.getMessage())).block();
+            }else if(rawMessage instanceof ServerInfoMessage){
+                ServerInfoMessage infoMessage = ((ServerInfoMessage) rawMessage);
+                Main.serverInfo.serverConnected(infoMessage.getServerID(),
+                        infoMessage.getServerName(),
+                        infoMessage.getServerAddress(),
+                        infoMessage.getMaxPlayers(),
+                        messageData.getMessageBus());
+            }else if(rawMessage instanceof ServerStatusMessage){
+                ServerStatusMessage serverStatus = ((ServerStatusMessage) rawMessage);
+                switch(serverStatus.getState()){
+                    case 1:
+                        messageChannel.createMessage("**`" + serverStatus.getServerID() + " Server Online`**").block();
+                        Main.serverInfo.serverOnline(serverStatus.getServerID());
+                        break;
+                    case 2:
+                        messageChannel.createMessage("**`" + serverStatus.getServerID() + " Server Offline`**").block();
+                        Main.serverInfo.serverOffline(serverStatus.getServerID());
+                        break;
+                    case 3:
+                        messageChannel.createMessage("**`" + serverStatus.getServerID() + " Server Crashed`**").block();
+                        Main.serverInfo.serverOffline(serverStatus.getServerID());
+                        break;
+                    default:
+                        System.err.println("Unrecognized server state " + serverStatus.getState() + " received from " + serverStatus.getServerID());
+                }
+            }else if(rawMessage instanceof PlayerStatusMessage){
+                String statusString;
+                PlayerStatusMessage playerStatus = ((PlayerStatusMessage) rawMessage);
+                if(playerStatus.getJoined()){
+                    statusString = "**`" + playerStatus.getServerID() + " " + playerStatus.getUserName() + " has joined the game`**";
+                    Main.serverInfo.playerJoin(playerStatus.getServerID(), playerStatus.getUserName());
+                }else{
+                    statusString = "**`" + playerStatus.getServerID() + " " + playerStatus.getUserName() + " has left the game`**";
+                    Main.serverInfo.playerLeave(playerStatus.getServerID(), playerStatus.getUserName());
+                }
+                if(!playerStatus.getSilent()){
+                    messageChannel.createMessage(statusString).block();
+                }
+            }else if(rawMessage instanceof PlayerListMessage){
+                PlayerListMessage plMessage = (PlayerListMessage) rawMessage;
+                Main.serverInfo.updatePlayerList(plMessage.getServerID(), plMessage.getPlayerList());
+            }else if(rawMessage instanceof CommandOutputMessage){
+                CommandOutputMessage message = (CommandOutputMessage) rawMessage;
+                ((TextChannel) Main.getChannelByName(message.getChannel())).createEmbed(embedSpec -> {
+                    if(!message.getCommand().isEmpty()){
+                        embedSpec.setTitle(message.getServerID() + ": " + message.getCommand());
                     }
-                }
-            } catch (RateLimitException e) {
-                limited = true;
-                try {
-                    Thread.sleep(e.getRetryDelay());
-                } catch (InterruptedException ignored) {
-                }
-            } catch (Exception e) {
-                System.err.println("Error sending message to Discord!");
-                e.printStackTrace();
+                    embedSpec.setDescription(message.getCommandOutput());
+                    Random random = new Random(System.currentTimeMillis());
+                    embedSpec.setColor(new Color(random.nextInt(0xFFFFFF)));
+                });
             }
-        } while (limited);
-
+        }
     }
 
     private String formatMessage(String message) {
-
-        IGuild guild = Main.channel.getGuild();
+        Guild guild = Main.channel.getGuild().block();
 
         Pattern roleMentions = Pattern.compile("(@\\w+)");
         Matcher roleMentionMatcher = roleMentions.matcher(message);
@@ -137,9 +108,9 @@ public class PrintMessageQueue extends ThreadedQueue<MessageData> {
                 String roleMention = roleMentionMatcher.group(i);
                 String name = roleMention.substring(1);
 
-                List<IRole> roleList = guild.getRolesByName(name);
-                if (roleList.size() > 0) {
-                    message = message.replace(roleMention, String.valueOf(roleList.get(0)));
+                Role role = Main.getRoleByName(name);
+                if (role != null) {
+                    message = message.replace(roleMention, String.valueOf(role));
                 }
             }
         }
@@ -154,9 +125,9 @@ public class PrintMessageQueue extends ThreadedQueue<MessageData> {
                 System.out.println(userMention);
                 System.out.println(name);
 
-                List<IUser> userList = guild.getUsersByName(name);
-                if (userList.size() > 0) {
-                    message = message.replace(userMention, String.valueOf(userList.get(0)));
+                Member member = Main.getMemberByName(name);
+                if (member != null) {
+                    message = message.replace(userMention, String.valueOf(member));
                 }
             }
         }

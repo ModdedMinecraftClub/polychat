@@ -24,7 +24,11 @@ import club.moddedminecraft.polychat.networking.io.Server;
 import club.moddedminecraft.polychat.server.info.OnlineServers;
 import discord4j.core.DiscordClient;
 import discord4j.core.DiscordClientBuilder;
+import discord4j.core.object.entity.Channel;
 import discord4j.core.object.entity.GuildChannel;
+import discord4j.core.object.entity.Member;
+import discord4j.core.object.entity.Role;
+import reactor.core.publisher.Flux;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -176,4 +180,35 @@ public final class Main {
         }
         return true;
     }
+
+    public static Channel getChannelByName(String name){
+        Flux<GuildChannel> channels = channel.getGuild().block().getChannels();
+        for(GuildChannel channel : channels.toIterable()){
+            if(channel.getName().equals(name)){
+                return channel;
+            }
+        }
+        throw new IllegalArgumentException("Channel not found: " + name);
+    }
+
+    public static Role getRoleByName(String name){
+        Flux<Role> roles = channel.getGuild().block().getRoles();
+        for(Role role : roles.toIterable()){
+            if(role.getName().equals(name)){
+                return role;
+            }
+        }
+        return null;
+    }
+
+    public static Member getMemberByName(String name){
+        Flux<Member> memberFlux = channel.getGuild().block().getMembers();
+        for(Member member : memberFlux.toIterable()){
+            if(member.getDisplayName().equalsIgnoreCase(name) || member.getNickname().equals(name) || member.getNicknameMention().equalsIgnoreCase(name) || member.getUsername().equalsIgnoreCase(name)){
+                return member;
+            }
+        }
+        return null;
+    }
+
 }
