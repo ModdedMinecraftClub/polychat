@@ -48,14 +48,16 @@ public class MinecraftCommand extends RoleCommand {
     }
 
     public String run(String[] inputArgs, String channel) {
-        ArrayList<OnlineServer> executeServers = new ArrayList<>();
         String command = this.command;
+        ArrayList<OnlineServer> executeServers = new ArrayList<>();
 
         if (inputArgs.length < 1) {
             return "Error running command: Server prefix required";
         }
 
-        if (inputArgs.length < (this.argCount - 1)) {
+        System.out.println(this.argCount);
+        System.out.println(inputArgs.length);
+        if (inputArgs.length < (this.argCount + 1)) {
             return "Expected at least " + this.argCount + " parameters, received " + (inputArgs.length - 1);
         }
 
@@ -92,7 +94,7 @@ public class MinecraftCommand extends RoleCommand {
         command = command.replace("$args", String.join(" ", args));
 
         for (OnlineServer server : executeServers) {
-            server.getMessageBus().sendMessage(new CommandMessage(server.getServerID(), command, channel));
+            server.getMessageBus().sendMessage(new CommandMessage(server.getServerID(), this.getName(), command, args, channel));
         }
 
         return "";
