@@ -21,6 +21,7 @@ package club.moddedminecraft.polychat.server;
 
 import club.moddedminecraft.polychat.networking.io.BroadcastMessage;
 import club.moddedminecraft.polychat.networking.io.Server;
+import club.moddedminecraft.polychat.server.info.OnlineClients;
 import club.moddedminecraft.polychat.server.info.OnlineServers;
 import discord4j.core.DiscordClient;
 import discord4j.core.DiscordClientBuilder;
@@ -42,6 +43,7 @@ public final class Main {
     public static DiscordClient discordClient;
     public static GuildChannel channel = null;
     public static OnlineServers serverInfo = new OnlineServers();
+    public static OnlineClients clientInfo = new OnlineClients();
     public static DiscordHandler discordHandler = new DiscordHandler();
     public static BroadcastManager broadcastManager = null;
     public static File yamlConfig;

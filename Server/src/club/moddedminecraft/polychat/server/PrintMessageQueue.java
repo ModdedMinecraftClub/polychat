@@ -42,12 +42,17 @@ public class PrintMessageQueue extends ThreadedQueue<MessageData> {
                 ChatMessage message = ((ChatMessage) rawMessage);
                 System.out.println(message.getUsername() + " " + message.getMessage());
                 messageChannel.createMessage("**`" + message.getUsername() + "`** " + formatMessage(message.getMessage())).block();
-            }else if(rawMessage instanceof ServerInfoMessage){
+            }else if(rawMessage instanceof ServerInfoMessage) {
                 ServerInfoMessage infoMessage = ((ServerInfoMessage) rawMessage);
                 Main.serverInfo.serverConnected(infoMessage.getServerID(),
                         infoMessage.getServerName(),
                         infoMessage.getServerAddress(),
                         infoMessage.getMaxPlayers(),
+                        messageData.getMessageBus());
+            } else if(rawMessage instanceof ClientInfoMessage) {
+                ClientInfoMessage infoMessage = ((ClientInfoMessage) rawMessage);
+                Main.clientInfo.serverConnected(infoMessage.getServerID(),
+                        infoMessage.getServerName(),
                         messageData.getMessageBus());
             }else if(rawMessage instanceof ServerStatusMessage){
                 ServerStatusMessage serverStatus = ((ServerStatusMessage) rawMessage);
@@ -66,6 +71,24 @@ public class PrintMessageQueue extends ThreadedQueue<MessageData> {
                         break;
                     default:
                         System.err.println("Unrecognized server state " + serverStatus.getState() + " received from " + serverStatus.getServerID());
+                }
+            }else if(rawMessage instanceof ClientStatusMessage){
+                ClientStatusMessage clientStatus = ((ClientStatusMessage) rawMessage);
+                switch(clientStatus.getState()){
+                    case 1:
+                        messageChannel.createMessage("**`" + clientStatus.getServerID() + " Client Online`**").block();
+                        Main.clientInfo.serverOnline(clientStatus.getServerID());
+                        break;
+                    case 2:
+                        messageChannel.createMessage("**`" + clientStatus.getServerID() + " Client Offline`**").block();
+                        Main.clientInfo.serverOffline(clientStatus.getServerID());
+                        break;
+                    case 3:
+                        messageChannel.createMessage("**`" + clientStatus.getServerID() + " Client Crashed`**").block();
+                        Main.clientInfo.serverOffline(clientStatus.getServerID());
+                        break;
+                    default:
+                        System.err.println("Unrecognized client state " + clientStatus.getState() + " received from " + clientStatus.getServerID());
                 }
             }else if(rawMessage instanceof PlayerStatusMessage){
                 String statusString;
@@ -109,7 +132,7 @@ public class PrintMessageQueue extends ThreadedQueue<MessageData> {
 
                 Role role = Main.getRoleByName(name);
                 if (role != null) {
-                    message = message.replace(roleMention, String.valueOf(role));
+                    message = message.replace(roleMention, role.getMention());
                 }
             }
         }
@@ -119,14 +142,11 @@ public class PrintMessageQueue extends ThreadedQueue<MessageData> {
         while (userMentionMatcher.find()) {
             for (int i = 0; i <= userMentionMatcher.groupCount(); i++) {
                 String userMention = userMentionMatcher.group(i);
-                // Remove @ and ()
                 String name = userMention.substring(2, (userMention.indexOf(')')));
-                System.out.println(userMention);
-                System.out.println(name);
 
                 Member member = Main.getMemberByName(name);
                 if (member != null) {
-                    message = message.replace(userMention, String.valueOf(member));
+                    message = message.replace(userMention, member.getMention());
                 }
             }
         }

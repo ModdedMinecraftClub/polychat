@@ -143,7 +143,7 @@ public class DiscordHandler {
     }
 
     public void processMessage(Message message) {
-        ChatMessage discordMessage = new ChatMessage(message.getAuthorAsMember().block().getDisplayName() + ":", formatMessage(message), "empty");
+        ChatMessage discordMessage = new ChatMessage(message.getAuthorAsMember().block().getDisplayName() + ":", formatMessage(message), "discord");
         System.out.println(discordMessage.getMessage());
         Main.chatServer.sendMessage(discordMessage);
     }

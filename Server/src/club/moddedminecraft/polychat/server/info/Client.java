@@ -24,41 +24,37 @@ import club.moddedminecraft.polychat.networking.io.MessageBus;
 
 import java.util.ArrayList;
 
-public class OnlineServer extends Client {
+public class Client {
     //Server id is the chat prefix and server name is the full name of the server, such as: [REV] / Revelation
-    private final String serverAddress;
-    //For displaying player information
-    private final int maxPlayers;
-    //List of players currently logged into this server
-    protected ArrayList<String> onlinePlayers;
+    private final String serverID, serverName;
+    //Since the mod establishes a socket with the main polychat server in preinit, the listing will report
+    //  the server as starting until the server says its fully started
+    private boolean started;
+    private MessageBus messageBus;
 
-    public OnlineServer(String serverID, String serverName, String serverAddress, int maxPlayers, MessageBus messageBus) {
-        super(serverID, serverName, messageBus);
-        this.serverAddress = serverAddress;
-        this.maxPlayers = maxPlayers;
-        this.onlinePlayers = new ArrayList<>();
+    public Client(String serverID, String serverName, MessageBus messageBus) {
+        this.serverID = serverID;
+        this.serverName = serverName;
+        this.started = false;
+        this.messageBus = messageBus;
     }
 
-    //Gets a count of online players
-    public int playerCount() {
-        return this.onlinePlayers.size();
+    //Sets this server as started
+    public void setStarted() {
+        this.started = true;
     }
 
-    public ArrayList<String> getOnlinePlayers() {
-        return this.onlinePlayers;
+    //Gets the server ID
+    public String getServerID() {
+        return this.serverID;
     }
 
-    //The maximum players on this server
-    public int maxPlayers() {
-        return this.maxPlayers;
+    //Gets the server name
+    public String getServerName() {
+        return this.serverName;
     }
 
-    //Gets the server address
-    public String getServerAddress() {
-        return this.serverAddress;
-    }
-
-    public void updatePlayerList(ArrayList<String> playerList) {
-        this.onlinePlayers = playerList;
+    public MessageBus getMessageBus() {
+        return messageBus;
     }
 }

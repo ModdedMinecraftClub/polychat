@@ -78,6 +78,12 @@ public final class MessageReceiver {
                     case CommandOutputMessage.MESSAGE_TYPE_ID:
                         messageProcessingQueue.enqueue(new CommandOutputMessage(dataInputStream));
                         break;
+                    case ClientInfoMessage.MESSAGE_TYPE_ID:
+                        messageProcessingQueue.enqueue(new ClientInfoMessage(dataInputStream));
+                        break;
+                    case ClientStatusMessage.MESSAGE_TYPE_ID:
+                        messageProcessingQueue.enqueue(new ClientStatusMessage(dataInputStream));
+                        break;
                     default:
                         System.err.println("[PolyChat] Warning: Illegal message id: " + messageId);
                 }
