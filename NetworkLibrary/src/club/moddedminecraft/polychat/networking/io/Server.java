@@ -107,6 +107,7 @@ public final class Server {
                     messageBus.sendMessage(messageData.getMessage());
                 }
             }
+            messageBuses.removeAll(toRemove);
         }
     }
 
