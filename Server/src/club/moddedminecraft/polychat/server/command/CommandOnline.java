@@ -51,6 +51,7 @@ public class CommandOnline extends Command {
             String prefix = Main.config.getProperty("prefix", "!");
             info.append("WARNING: This command is deprecated and will soon be removed in favor of ").append(prefix).append(oc).append(".\n");
         }
+        info.append(String.format("**Total Players Online: %d**", Main.serverInfo.getTotalPlayers())).append("\n");
         info.append(String.format("**Servers Online [%d]:**", Main.serverInfo.getServers().size())).append("\n");
         for (OnlineServer server : Main.serverInfo.getServers()) {
             info.append(String.format(

@@ -5,12 +5,12 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 
-public class PlayerListMessage extends AbstractMessage{
+public class PlayerListMessage extends AbstractMessage {
 
     protected static final short MESSAGE_TYPE_ID = 5;
     private final String serverID;
     private final int listSize;
-    private ArrayList<String> playerList;
+    private final ArrayList<String> playerList;
 
     public PlayerListMessage(String serverID, ArrayList<String> playerList) {
         this.serverID = serverID;

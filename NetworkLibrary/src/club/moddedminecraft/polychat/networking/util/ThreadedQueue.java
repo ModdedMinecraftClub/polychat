@@ -26,9 +26,9 @@ public abstract class ThreadedQueue<T> {
     public final void start() {
         executorService = Executors.newSingleThreadExecutor();
         executorService.submit(() -> {
-            try{
+            try {
                 init();
-            }catch(Throwable t){
+            } catch (Throwable t) {
                 t.printStackTrace();
             }
         });
@@ -40,9 +40,9 @@ public abstract class ThreadedQueue<T> {
 
     public final synchronized void enqueue(final T obj) {
         executorService.submit(() -> {
-            try{
+            try {
                 handle(obj);
-            }catch(Throwable t){
+            } catch (Throwable t) {
                 t.printStackTrace();
             }
         });

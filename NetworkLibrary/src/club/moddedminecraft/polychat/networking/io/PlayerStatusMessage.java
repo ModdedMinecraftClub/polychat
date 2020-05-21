@@ -24,7 +24,7 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
-public class PlayerStatusMessage extends AbstractMessage{
+public class PlayerStatusMessage extends AbstractMessage {
     protected static final short MESSAGE_TYPE_ID = 3;
     private final String userName, serverID, prefixJson;
     private final boolean joined, silent;

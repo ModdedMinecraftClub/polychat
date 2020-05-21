@@ -57,7 +57,11 @@ public class OnlineServer {
     }
 
     public ArrayList<String> getOnlinePlayers() {
-        return this.onlinePlayers;
+        ArrayList<String> players = new ArrayList<>();
+        for (String player : this.onlinePlayers) {
+            players.add(player.replace("_", "\\_")); // escape underscore from italicizing on Discord
+        }
+        return players;
     }
 
     //The maximum players on this server
