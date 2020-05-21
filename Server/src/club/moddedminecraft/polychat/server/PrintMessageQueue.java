@@ -22,11 +22,30 @@ import club.moddedminecraft.polychat.networking.util.ThreadedQueue;
 import discord4j.core.object.entity.*;
 
 import java.awt.*;
+import java.util.HashMap;
 import java.util.Random;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class PrintMessageQueue extends ThreadedQueue<MessageData> {
+    private static final HashMap<String, Color> colorHashMap = new HashMap<String, Color>() {{
+        put("0", new Color(0x000000));
+        put("1", new Color(0x0000AA));
+        put("2", new Color(0x00AA00));
+        put("3", new Color(0x00AAAA));
+        put("4", new Color(0xAA0000));
+        put("5", new Color(0xAA00AA));
+        put("6", new Color(0xFFAA00));
+        put("7", new Color(0xAAAAAA));
+        put("8", new Color(0x555555));
+        put("9", new Color(0x5555FF));
+        put("a", new Color(0x55FF55));
+        put("b", new Color(0x55FFFF));
+        put("c", new Color(0xFF5555));
+        put("d", new Color(0xFF55FF));
+        put("e", new Color(0xFFFF55));
+        put("f", new Color(0xFFFFFF));
+    }};
 
     @Override
     protected void init() {
@@ -91,7 +110,7 @@ public class PrintMessageQueue extends ThreadedQueue<MessageData> {
                     }
                     embedSpec.setDescription(message.getCommandOutput());
                     Random random = new Random(System.currentTimeMillis());
-                    embedSpec.setColor(new Color(random.nextInt(0xFFFFFF)));
+                    embedSpec.setColor(colorHashMap.get(message.getColor()));
                 }).block();
             }
         }

@@ -40,7 +40,6 @@ public class OnlineServers {
     }
 
     public OnlineServer getServer(String serverID) {
-        System.out.println(serverMap);
         return serverMap.getOrDefault(serverID, null);
     }
 
@@ -100,6 +99,14 @@ public class OnlineServers {
         if (server != null) {
             serverMap.get(serverID).onlinePlayers.remove(username);
         }
+    }
+
+    public int getTotalPlayers() {
+        int total = 0;
+        for (OnlineServer server : onlineServers) {
+            total += server.getOnlinePlayers().size();
+        }
+        return total;
     }
 
 }

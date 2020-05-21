@@ -24,19 +24,21 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
-public class CommandOutputMessage extends AbstractMessage{
+public class CommandOutputMessage extends AbstractMessage {
 
     protected static final short MESSAGE_TYPE_ID = 7;
     private final String command;
     private final String commandOutput;
     private final String channel;
     private final String serverID;
+    private final String color;
 
-    public CommandOutputMessage(String serverID, String command, String commandOutput, String channel) {
+    public CommandOutputMessage(String serverID, String command, String commandOutput, String channel, String color) {
         this.serverID = serverID;
         this.command = command;
         this.commandOutput = commandOutput;
         this.channel = channel;
+        this.color = color;
     }
 
     public CommandOutputMessage(DataInputStream istream) throws IOException {
@@ -44,6 +46,7 @@ public class CommandOutputMessage extends AbstractMessage{
         this.command = istream.readUTF();
         this.commandOutput = istream.readUTF();
         this.channel = istream.readUTF();
+        this.color = istream.readUTF();
     }
 
     public String getServerID() {
@@ -62,6 +65,10 @@ public class CommandOutputMessage extends AbstractMessage{
         return channel;
     }
 
+    public String getColor() {
+        return color;
+    }
+
     @Override
     protected void send(DataOutputStream dataOutputStream) throws IOException {
         dataOutputStream.writeShort(MESSAGE_TYPE_ID);
@@ -69,6 +76,7 @@ public class CommandOutputMessage extends AbstractMessage{
         dataOutputStream.writeUTF(command);
         dataOutputStream.writeUTF(commandOutput);
         dataOutputStream.writeUTF(channel);
+        dataOutputStream.writeUTF(color);
     }
 
 }

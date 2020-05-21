@@ -25,20 +25,21 @@ import club.moddedminecraft.polychat.server.Main;
 import club.moddedminecraft.polychat.server.info.OnlineServer;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class MinecraftCommand extends RoleCommand {
 
-    private final String command;
+    private final String defaultcmd;
     private final int argCount;
     private String channel;
 
     public MinecraftCommand(String name, Map<String, Object> args) {
         super(name, args);
-        this.command = (String) args.get("command");
-        this.argCount = calculateParameters(command);
+        this.defaultcmd = (String) args.get("command");
+        this.argCount = calculateParameters(defaultcmd);
     }
 
     public int calculateParameters(String command) {
@@ -48,23 +49,13 @@ public class MinecraftCommand extends RoleCommand {
     }
 
     public String run(String[] inputArgs, String channel) {
-        ArrayList<OnlineServer> executeServers = new ArrayList<>();
-        String command = this.command;
 
         if (inputArgs.length < 1) {
             return "Error running command: Server prefix required";
         }
-
-        if (inputArgs.length < (this.argCount - 1)) {
-            return "Expected at least " + this.argCount + " parameters, received " + (inputArgs.length - 1);
-        }
-
         String serverID = inputArgs[0];
-        ArrayList<String> args = new ArrayList<>();
-        for (int i = 1; i < inputArgs.length; i++) {
-            args.add(inputArgs[i]);
-        }
 
+        ArrayList<OnlineServer> executeServers = new ArrayList<>();
         if (serverID.equals("<all>")) {
             executeServers.addAll(Main.serverInfo.getServers());
         } else {
@@ -75,24 +66,12 @@ public class MinecraftCommand extends RoleCommand {
             executeServers.add(server);
         }
 
-        // get the last instance of every unique $(number)
-        // ie. /ranks set $1 $2 $1 $3 returns $2 $1 $3
-        Pattern pattern = Pattern.compile("(\\$\\d+)(?!.*\\1)");
-        Matcher matcher = pattern.matcher(this.command);
 
-        while (matcher.find()) {
-            for (int i = 0; i <= matcher.groupCount(); i++) {
-                String toBeReplaced = matcher.group(i);
-                String replaceWith;
-                int argNum = Integer.parseInt(toBeReplaced.substring(1));
-                replaceWith = args.get(argNum - 1);
-                command = command.replace(toBeReplaced, replaceWith);
-            }
-        }
-        command = command.replace("$args", String.join(" ", args));
+        // process arguments into ArrayList (exclude the first element which is the prefix)
+        ArrayList<String> args = new ArrayList<>(Arrays.asList(inputArgs).subList(1, inputArgs.length));
 
         for (OnlineServer server : executeServers) {
-            server.getMessageBus().sendMessage(new CommandMessage(server.getServerID(), command, channel));
+            server.getMessageBus().sendMessage(new CommandMessage(server.getServerID(), this.getName(), defaultcmd, args, channel));
         }
 
         return "";
