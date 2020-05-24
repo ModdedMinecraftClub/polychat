@@ -39,12 +39,12 @@ public class PrintMessageQueue extends ThreadedQueue<MessageData> {
         put("7", new Color(0xAAAAAA));
         put("8", new Color(0x555555));
         put("9", new Color(0x5555FF));
-        put("a", new Color(0x55FF55));
-        put("b", new Color(0x55FFFF));
-        put("c", new Color(0xFF5555));
-        put("d", new Color(0xFF55FF));
-        put("e", new Color(0xFFFF55));
-        put("f", new Color(0xFFFFFF));
+        put("10", new Color(0x55FF55));
+        put("11", new Color(0x55FFFF));
+        put("12", new Color(0xFF5555));
+        put("13", new Color(0xFF55FF));
+        put("14", new Color(0xFFFF55));
+        put("15", new Color(0xFFFFFF));
     }};
 
     @Override
@@ -109,7 +109,6 @@ public class PrintMessageQueue extends ThreadedQueue<MessageData> {
                         embedSpec.setTitle(message.getServerID() + ": " + message.getCommand());
                     }
                     embedSpec.setDescription(message.getCommandOutput());
-                    Random random = new Random(System.currentTimeMillis());
                     embedSpec.setColor(colorHashMap.get(message.getColor()));
                 }).block();
             }
