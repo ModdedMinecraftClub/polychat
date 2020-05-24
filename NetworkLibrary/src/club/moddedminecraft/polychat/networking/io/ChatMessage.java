@@ -23,30 +23,30 @@ import java.io.IOException;
 
 public final class ChatMessage extends AbstractMessage {
     protected static final short MESSAGE_TYPE_ID = 1;
-    private final String username, message, componentJson;
+    private final String username, message, formattedMessage;
 
     protected ChatMessage(DataInputStream dataInputStream) throws IOException {
         username = dataInputStream.readUTF();
         message = dataInputStream.readUTF();
-        componentJson = dataInputStream.readUTF();
+        formattedMessage = dataInputStream.readUTF();
     }
 
-    public ChatMessage(String username, String message, String componentJson) {
+    public ChatMessage(String username, String message, String formattedMessage) {
         this.username = username;
         this.message = message;
-        this.componentJson = componentJson;
+        this.formattedMessage = formattedMessage;
     }
 
     public String getUsername() {
-        return username;
+                                      return username;
     }
 
     public String getMessage() {
         return message;
     }
 
-    public String getComponentJson() {
-        return componentJson;
+    public String getFormattedMessage() {
+        return formattedMessage;
     }
 
     @Override
@@ -54,7 +54,7 @@ public final class ChatMessage extends AbstractMessage {
         dataOutputStream.writeShort(MESSAGE_TYPE_ID);
         dataOutputStream.writeUTF(username);
         dataOutputStream.writeUTF(message);
-        dataOutputStream.writeUTF(componentJson);
+        dataOutputStream.writeUTF(formattedMessage);
     }
 
 }

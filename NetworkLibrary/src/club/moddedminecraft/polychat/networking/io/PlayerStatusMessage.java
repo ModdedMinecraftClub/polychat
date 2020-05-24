@@ -26,13 +26,13 @@ import java.io.IOException;
 
 public class PlayerStatusMessage extends AbstractMessage {
     protected static final short MESSAGE_TYPE_ID = 3;
-    private final String userName, serverID, prefixJson;
+    private final String userName, serverID, formattedPrefix;
     private final boolean joined, silent;
 
     public PlayerStatusMessage(String userName, String serverID, String prefixJson, boolean joined, boolean silent) {
         this.userName = userName;
         this.serverID = serverID;
-        this.prefixJson = prefixJson;
+        this.formattedPrefix = prefixJson;
         this.joined = joined;
         this.silent = silent;
     }
@@ -40,7 +40,7 @@ public class PlayerStatusMessage extends AbstractMessage {
     public PlayerStatusMessage(DataInputStream istream) throws IOException {
         this.userName = istream.readUTF();
         this.serverID = istream.readUTF();
-        this.prefixJson = istream.readUTF();
+        this.formattedPrefix = istream.readUTF();
         this.joined = istream.readBoolean();
         this.silent = istream.readBoolean();
     }
@@ -62,8 +62,8 @@ public class PlayerStatusMessage extends AbstractMessage {
         return this.silent;
     }
 
-    public String getPrefixJson() {
-        return this.prefixJson;
+    public String getFormattedPrefix() {
+        return this.formattedPrefix;
     }
 
     @Override
@@ -71,7 +71,7 @@ public class PlayerStatusMessage extends AbstractMessage {
         dataOutputStream.writeShort(MESSAGE_TYPE_ID);
         dataOutputStream.writeUTF(userName);
         dataOutputStream.writeUTF(serverID);
-        dataOutputStream.writeUTF(prefixJson);
+        dataOutputStream.writeUTF(formattedPrefix);
         dataOutputStream.writeBoolean(joined);
         dataOutputStream.writeBoolean(silent);
     }
