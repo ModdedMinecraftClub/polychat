@@ -20,15 +20,22 @@
 
 package club.moddedminecraft.polychat.server.command;
 
+import club.moddedminecraft.polychat.server.DiscordHandler;
+import club.moddedminecraft.polychat.server.Main;
+import discord4j.core.object.entity.Member;
 import discord4j.core.object.entity.Message;
+import discord4j.core.object.entity.Role;
 import discord4j.core.object.entity.TextChannel;
+import reactor.core.publisher.Flux;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 public class CommandManager {
-    private ArrayList<Command> cmdList = new ArrayList<>();
+    private final ArrayList<Command> cmdList = new ArrayList<>();
     private ArrayList<String> channels = new ArrayList<>();
     private String prefix;
+    private final ArrayList<String> allPrefixRoles = new ArrayList<>();
 
     public void setPrefix(String prefix) {
         this.prefix = prefix;
@@ -42,16 +49,33 @@ public class CommandManager {
         cmdList.addAll(collection);
     }
 
-    public void setChannels(ArrayList<String> channels) {
-        this.channels = channels;
-    }
-
     public ArrayList<String> getChannels() {
         return channels;
     }
 
+    public void setChannels(ArrayList<String> channels) {
+        this.channels = channels;
+    }
+
     public ArrayList<Command> getCommandList() {
         return cmdList;
+    }
+
+    public void addPrefixRoles(ArrayList<String> roles) {
+        allPrefixRoles.addAll(roles);
+    }
+
+    public boolean isAllAuthorized(Member user) {
+        if (allPrefixRoles.isEmpty()) {
+            return true;
+        }
+        Flux<Role> userRoles = user.getRoles();
+        for(Role role : userRoles.toIterable()){
+            if(allPrefixRoles.contains(role.getName())){
+                return true;
+            }
+        }
+        return false;
     }
 
     public String run(Message message) {
@@ -69,7 +93,11 @@ public class CommandManager {
         // get everything after first word (args)
         for (Command cmd : cmdList) {
             if (cmd.getName().equals(cmdName)) {
-                if (cmd instanceof RoleCommand) {
+                if (cmd instanceof MinecraftCommand) {
+                    boolean authorized = isAllAuthorized(message.getAuthorAsMember().block());
+                    ((MinecraftCommand) cmd).setAllAuthorized(authorized);
+                    return ((MinecraftCommand) cmd).verifyAndRun(message.getAuthorAsMember().block(), args, textChannel.getName());
+                } else if (cmd instanceof RoleCommand) {
                     return ((RoleCommand) cmd).verifyAndRun(message.getAuthorAsMember().block(), args, textChannel.getName());
                 } else {
                     return cmd.run(args, textChannel.getName());

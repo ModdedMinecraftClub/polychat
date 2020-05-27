@@ -56,7 +56,7 @@ public class OnlineServers {
 
     //Adds a server to the list
     public void serverConnected(String serverID, String serverName, String serverAddress, int maxPlayers, MessageBus messageBus) {
-        OnlineServer toRemove = serverMap.get(serverID);
+        OnlineServer toRemove = getServerNormalized(serverID);
         if (toRemove != null) {
             onlineServers.remove(toRemove);
         }
@@ -67,7 +67,7 @@ public class OnlineServers {
 
     //Marks a server as online
     public void serverOnline(String serverID) {
-        OnlineServer server = serverMap.get(serverID);
+        OnlineServer server = getServerNormalized(serverID);
         if (server != null) {
             server.setStarted();
         }
@@ -75,29 +75,29 @@ public class OnlineServers {
 
     //Removes a server as it went offline
     public void serverOffline(String serverID) {
-        OnlineServer toRemove = serverMap.get(serverID);
+        OnlineServer toRemove = getServerNormalized(serverID);
         onlineServers.remove(toRemove);
         serverMap.remove(serverID);
     }
 
     public void updatePlayerList(String serverID, ArrayList<String> playerList) {
-        OnlineServer server = serverMap.get(serverID);
+        OnlineServer server = getServerNormalized(serverID);
         if (server != null) {
             server.updatePlayerList(playerList);
         }
     }
 
     public void playerJoin(String serverID, String username) {
-        OnlineServer server = serverMap.get(serverID);
+        OnlineServer server = getServerNormalized(serverID);
         if (server != null) {
-            serverMap.get(serverID).onlinePlayers.add(username);
+            server.onlinePlayers.add(username);
         }
     }
 
     public void playerLeave(String serverID, String username) {
-        OnlineServer server = serverMap.get(serverID);
+        OnlineServer server = getServerNormalized(serverID);
         if (server != null) {
-            serverMap.get(serverID).onlinePlayers.remove(username);
+            server.onlinePlayers.remove(username);
         }
     }
 

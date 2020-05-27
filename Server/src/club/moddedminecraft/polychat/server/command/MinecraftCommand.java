@@ -23,6 +23,7 @@ package club.moddedminecraft.polychat.server.command;
 import club.moddedminecraft.polychat.networking.io.CommandMessage;
 import club.moddedminecraft.polychat.server.Main;
 import club.moddedminecraft.polychat.server.info.OnlineServer;
+import discord4j.core.object.entity.Role;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -35,11 +36,16 @@ public class MinecraftCommand extends RoleCommand {
     private final String defaultcmd;
     private final int argCount;
     private String channel;
+    private boolean allAuthorized;
 
     public MinecraftCommand(String name, Map<String, Object> args) {
         super(name, args);
         this.defaultcmd = (String) args.get("command");
         this.argCount = calculateParameters(defaultcmd);
+    }
+
+    public void setAllAuthorized(boolean allAuthorized) {
+        this.allAuthorized = allAuthorized;
     }
 
     public int calculateParameters(String command) {
@@ -51,17 +57,21 @@ public class MinecraftCommand extends RoleCommand {
     public String run(String[] inputArgs, String channel) {
 
         if (inputArgs.length < 1) {
-            return "Error running command: Server prefix required";
+            return "Error: Server prefix required";
         }
         String serverID = inputArgs[0];
 
         ArrayList<OnlineServer> executeServers = new ArrayList<>();
         if (serverID.equals("<all>")) {
-            executeServers.addAll(Main.serverInfo.getServers());
+            if (allAuthorized) {
+                executeServers.addAll(Main.serverInfo.getServers());
+            } else {
+                return "Error: You do not have permission to use <all>!";
+            }
         } else {
             OnlineServer server = Main.serverInfo.getServerNormalized(serverID);
             if (server == null) {
-                return "Error running command: server prefix " + serverID + " does not exist.";
+                return "Error: server prefix " + serverID + " does not exist.";
             }
             executeServers.add(server);
         }

@@ -29,10 +29,10 @@ public class PlayerStatusMessage extends AbstractMessage {
     private final String userName, serverID, formattedPrefix;
     private final boolean joined, silent;
 
-    public PlayerStatusMessage(String userName, String serverID, String prefixJson, boolean joined, boolean silent) {
+    public PlayerStatusMessage(String userName, String serverID, String formattedJson, boolean joined, boolean silent) {
         this.userName = userName;
         this.serverID = serverID;
-        this.formattedPrefix = prefixJson;
+        this.formattedPrefix = formattedJson;
         this.joined = joined;
         this.silent = silent;
     }

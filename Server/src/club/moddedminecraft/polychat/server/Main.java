@@ -157,7 +157,7 @@ public final class Main {
 
     //Initializes the connection to the discord API using the API token
     public static void initDiscord() {
-        discordClient = new DiscordClientBuilder(config.getProperty("api_token")).build();
+        discordClient = DiscordClientBuilder.create(config.getProperty("api_token")).build();
         discordHandler.registerEventSubscribers(discordClient);
         discordClient.login().block();
     }

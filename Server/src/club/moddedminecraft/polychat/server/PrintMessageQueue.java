@@ -137,10 +137,9 @@ public class PrintMessageQueue extends ThreadedQueue<MessageData> {
         while (userMentionMatcher.find()) {
             for (int i = 0; i <= userMentionMatcher.groupCount(); i++) {
                 String userMention = userMentionMatcher.group(i);
+
                 // Remove @ and ()
                 String name = userMention.substring(2, (userMention.indexOf(')')));
-                System.out.println(userMention);
-                System.out.println(name);
 
                 Member member = Main.getMemberByName(name);
                 if (member != null) {

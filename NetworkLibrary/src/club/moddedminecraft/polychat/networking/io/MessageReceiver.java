@@ -24,6 +24,7 @@ import java.io.EOFException;
 import java.io.IOException;
 import java.io.InterruptedIOException;
 import java.net.Socket;
+import java.net.SocketException;
 
 public final class MessageReceiver {
     private final Socket socket;
@@ -82,7 +83,7 @@ public final class MessageReceiver {
                         System.err.println("[PolyChat] Warning: Illegal message id: " + messageId);
                 }
             }
-        } catch (InterruptedIOException | EOFException ignored) {
+        } catch (InterruptedIOException | EOFException | SocketException ignored) {
         } catch (IOException e) {
             e.printStackTrace();
         }

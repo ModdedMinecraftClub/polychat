@@ -10,6 +10,6 @@
     <orderEntry type="module" module-name="NetworkLibrary" />
     <orderEntry type="library" name="org.yaml:snakeyaml:1.25" level="project" />
     <orderEntry type="library" name="com.vdurmont:emoji-java:5.1.0" level="project" />
-    <orderEntry type="library" name="com.discord4j:discord4j-core:3.0.10" level="project" />
+    <orderEntry type="library" name="com.discord4j:discord4j-core:3.0.14" level="project" />
   </component>
 </module>

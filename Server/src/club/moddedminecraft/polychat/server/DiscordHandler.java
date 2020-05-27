@@ -106,15 +106,18 @@ public class DiscordHandler {
 
         ArrayList<String> commandChannels = (ArrayList<String>) yamlObj.remove("channels");
         manager.setChannels(commandChannels);
-        for (Object entryObj : yamlObj.entrySet()) {
 
-            Map.Entry<String, ArrayList> entry = (Map.Entry<String, ArrayList>) entryObj;
+        ArrayList<String> prefixRoles = (ArrayList<String>) yamlObj.remove("all_roles");
+        manager.addPrefixRoles(prefixRoles);
+
+        for (Object entryObj : (ArrayList) yamlObj.get("commands")) {
+            LinkedHashMap entry = (LinkedHashMap) entryObj;
             HashMap<String, String> argMap = new HashMap<>();
-            for (Object mapObj : entry.getValue()) {
+            for (Object mapObj : (ArrayList) entry.values().iterator().next()) {
                 argMap.putAll((HashMap<String, String>) mapObj);
             }
 
-            String name = entry.getKey();
+            String name = (String) entry.keySet().iterator().next(); // kinda ugly but way too deep down the rabbit hole
             String type = argMap.remove("type");
 
             Class<? extends Command> element = COMMAND_TYPES.get(type);
@@ -143,8 +146,9 @@ public class DiscordHandler {
     }
 
     public void processMessage(Message message) {
-        ChatMessage discordMessage = new ChatMessage(message.getAuthorAsMember().block().getDisplayName() + ":", formatMessage(message), "empty");
-        System.out.println(discordMessage.getMessage());
+        String author = message.getAuthorAsMember().block().getDisplayName() + ":";
+        ChatMessage discordMessage = new ChatMessage(author, formatMessage(message), "empty");
+        System.out.println(String.format("[Discord] %s %s", author, discordMessage.getMessage()));
         Main.chatServer.sendMessage(discordMessage);
     }
 
