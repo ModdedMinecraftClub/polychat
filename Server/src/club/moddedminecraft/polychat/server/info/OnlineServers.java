@@ -56,7 +56,7 @@ public class OnlineServers {
 
     //Adds a server to the list
     public void serverConnected(String serverID, String serverName, String serverAddress, int maxPlayers, MessageBus messageBus) {
-        OnlineServer toRemove = getServerNormalized(serverID);
+        OnlineServer toRemove = serverMap.get(serverID);
         if (toRemove != null) {
             onlineServers.remove(toRemove);
         }
@@ -67,7 +67,7 @@ public class OnlineServers {
 
     //Marks a server as online
     public void serverOnline(String serverID) {
-        OnlineServer server = getServerNormalized(serverID);
+        OnlineServer server = serverMap.get(serverID);
         if (server != null) {
             server.setStarted();
         }
@@ -75,27 +75,27 @@ public class OnlineServers {
 
     //Removes a server as it went offline
     public void serverOffline(String serverID) {
-        OnlineServer toRemove = getServerNormalized(serverID);
+        OnlineServer toRemove = serverMap.get(serverID);
         onlineServers.remove(toRemove);
         serverMap.remove(serverID);
     }
 
     public void updatePlayerList(String serverID, ArrayList<String> playerList) {
-        OnlineServer server = getServerNormalized(serverID);
+        OnlineServer server = serverMap.get(serverID);
         if (server != null) {
             server.updatePlayerList(playerList);
         }
     }
 
     public void playerJoin(String serverID, String username) {
-        OnlineServer server = getServerNormalized(serverID);
+        OnlineServer server = serverMap.get(serverID);
         if (server != null) {
             server.onlinePlayers.add(username);
         }
     }
 
     public void playerLeave(String serverID, String username) {
-        OnlineServer server = getServerNormalized(serverID);
+        OnlineServer server = serverMap.get(serverID);
         if (server != null) {
             server.onlinePlayers.remove(username);
         }
