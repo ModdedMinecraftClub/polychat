@@ -147,7 +147,7 @@ public class DiscordHandler {
 
     public void processMessage(Message message) {
         String author = message.getAuthorAsMember().block().getDisplayName() + ":";
-        ChatMessage discordMessage = new ChatMessage(author, formatMessage(message), "empty");
+        ChatMessage discordMessage = new ChatMessage(author.replaceAll("§.", ""), formatMessage(message).replaceAll("§.", ""), "empty");
         System.out.println(String.format("[Discord] %s %s", author, discordMessage.getMessage()));
         Main.chatServer.sendMessage(discordMessage);
     }
