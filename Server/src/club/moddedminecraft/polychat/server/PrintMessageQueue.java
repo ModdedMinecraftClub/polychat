@@ -118,32 +118,53 @@ public class PrintMessageQueue extends ThreadedQueue<MessageData> {
     private String formatMessage(String message) {
         Guild guild = Main.channel.getGuild().block();
 
+        // role mentions: @Staff
         Pattern roleMentions = Pattern.compile("(@\\w+)");
         Matcher roleMentionMatcher = roleMentions.matcher(message);
         while (roleMentionMatcher.find()) {
             for (int i = 0; i <= roleMentionMatcher.groupCount(); i++) {
                 String roleMention = roleMentionMatcher.group(i);
+
+                // Remove extra @
                 String name = roleMention.substring(1);
 
                 Role role = Main.getRoleByName(name);
                 if (role != null) {
-                    message = message.replace(roleMention, String.valueOf(role));
+                    message = message.replace(roleMention, role.getMention());
                 }
             }
         }
 
-        Pattern userMentions = Pattern.compile("(@\\(.+\\))");
+        // user pings: @User
+        Pattern userMentions = Pattern.compile("(@\\w+)");
         Matcher userMentionMatcher = userMentions.matcher(message);
         while (userMentionMatcher.find()) {
             for (int i = 0; i <= userMentionMatcher.groupCount(); i++) {
                 String userMention = userMentionMatcher.group(i);
 
-                // Remove @ and ()
+                // Remove extra @
+                String name = userMention.substring(1);
+
+                Member member = Main.getMemberByName(name);
+                if (member != null) {
+                    message = message.replace(userMention, member.getNicknameMention());
+                }
+            }
+        }
+
+        // multiword user pings: @(Cool User)
+        Pattern wordMentions = Pattern.compile("(@\\(.+\\))");
+        Matcher wordMentionMatcher = wordMentions.matcher(message);
+        while (wordMentionMatcher.find()) {
+            for (int i = 0; i <= wordMentionMatcher.groupCount(); i++) {
+                String userMention = wordMentionMatcher.group(i);
+
+                // Remove extra @ and ()
                 String name = userMention.substring(2, (userMention.indexOf(')')));
 
                 Member member = Main.getMemberByName(name);
                 if (member != null) {
-                    message = message.replace(userMention, String.valueOf(member));
+                    message = message.replace(userMention, member.getNicknameMention());
                 }
             }
         }
