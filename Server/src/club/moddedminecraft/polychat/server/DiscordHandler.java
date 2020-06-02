@@ -97,6 +97,7 @@ public class DiscordHandler {
             {
                 put("online", CommandOnline.class);
                 put("help", CommandHelp.class);
+                put("message", CommandMessage.class);
                 put("minecraft", MinecraftCommand.class);
             }
         };
