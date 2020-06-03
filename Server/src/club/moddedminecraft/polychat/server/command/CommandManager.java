@@ -42,11 +42,21 @@ public class CommandManager {
     }
 
     public void register(Command command) {
+        if (command instanceof CommandAlias) {
+            CommandAlias alias = ((CommandAlias) command);
+            for (Command cmd : cmdList) {
+                if (alias.getAlias().equals(cmd.getName())) {
+                    alias.setCommand(cmd);
+                }
+            }
+        }
         cmdList.add(command);
     }
 
     public void register(ArrayList<Command> collection) {
-        cmdList.addAll(collection);
+        for (Command cmd : collection) {
+            register(cmd);
+        }
     }
 
     public ArrayList<String> getChannels() {

@@ -12,11 +12,6 @@ public class CommandMessage extends Command {
         this.message = (String) args.get("message");
     }
 
-    @Override
-    public String getDescription() {
-        return "Show predefined message";
-    }
-
     public String run(String[] args, String channel) {
         return this.message;
     }

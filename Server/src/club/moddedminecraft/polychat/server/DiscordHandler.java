@@ -64,6 +64,7 @@ public class DiscordHandler {
                     try{
                         registerCommands();
                     }catch(Exception e){
+                        System.out.println(Arrays.toString(e.getStackTrace()));
                         System.err.println("Error " + e.toString() + " encountered while registering commands, ignoring...");
                     }
                     return;
@@ -91,6 +92,25 @@ public class DiscordHandler {
         }
     }
 
+    private class AliasSort implements Comparator<LinkedHashMap> {
+
+        // terrible horrible no good code
+        // deprioritizes aliases
+        @Override
+        public int compare(LinkedHashMap a, LinkedHashMap b) {
+            String type = ((String) a.get("type"));
+            if (type != null && type.equals("alias")) {
+                return -1;
+            }
+            type = ((String) b.get("type"));
+            if (type != null && type.equals("alias")) {
+                return 1;
+            }
+            return 0;
+        }
+
+    }
+
     public void registerCommands() throws FileNotFoundException, NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException {
 
         final HashMap<String, Class<? extends Command>> COMMAND_TYPES = new HashMap<String, Class<? extends Command>>() {
@@ -99,6 +119,7 @@ public class DiscordHandler {
                 put("help", CommandHelp.class);
                 put("message", CommandMessage.class);
                 put("minecraft", MinecraftCommand.class);
+                put("alias", CommandAlias.class);
             }
         };
 
@@ -114,7 +135,9 @@ public class DiscordHandler {
         for (Object entryObj : (ArrayList) yamlObj.get("commands")) {
             LinkedHashMap entry = (LinkedHashMap) entryObj;
             HashMap<String, String> argMap = new HashMap<>();
-            for (Object mapObj : (ArrayList) entry.values().iterator().next()) {
+            ArrayList commands = (ArrayList) entry.values().iterator().next();
+            commands.sort(new AliasSort());
+            for (Object mapObj : commands) {
                 argMap.putAll((HashMap<String, String>) mapObj);
             }
 
