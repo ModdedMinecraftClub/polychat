@@ -19,12 +19,18 @@ package club.moddedminecraft.polychat.networking.util;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.RejectedExecutionException;
 
 public abstract class ThreadedQueue<T> {
     private ExecutorService executorService;
 
     public final void start() {
-        executorService = Executors.newSingleThreadExecutor();
+        executorService = Executors.newSingleThreadExecutor((Runnable runnable) -> {
+            Thread thread = new Thread(runnable);
+            thread.setName("Polychat worker thread");
+            thread.setDaemon(true);
+            return thread;
+        });
         executorService.submit(() -> {
             try {
                 init();
@@ -39,13 +45,17 @@ public abstract class ThreadedQueue<T> {
     }
 
     public final synchronized void enqueue(final T obj) {
-        executorService.submit(() -> {
-            try {
-                handle(obj);
-            } catch (Throwable t) {
-                t.printStackTrace();
-            }
-        });
+        try{
+            executorService.submit(() -> {
+                try{
+                    handle(obj);
+                }catch(Throwable t){
+                    t.printStackTrace();
+                }
+            });
+        }catch(RejectedExecutionException e){
+            //we can't send messages after the executorservice shuts down
+        }
     }
 
     protected abstract void init() throws Throwable;
